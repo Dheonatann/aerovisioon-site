@@ -6,42 +6,42 @@
       "name": "Canoa OC6",
       "cap": "4 a 6 pessoas",
       "price": "R$100",
-      "img": "images/oc6.png",
+      "img": "images/1-mr58ly5y.png",
       "desc": "A canoa havaiana clássica. Perfeita para grupos pequenos e remadas em equipe."
     },
     {
       "name": "Canoa Catamarã",
       "cap": "8 a 12 pessoas",
       "price": "R$150",
-      "img": "images/catamara.png",
+      "img": "images/2-mr58m6o9.png",
       "desc": "Duas cascas, mais gente a bordo. Registro aéreo do grupo remando em sincronia."
     },
     {
       "name": "Canoa Trimarã",
       "cap": "14 a 18 pessoas",
       "price": "R$200",
-      "img": "images/hero-sunset.png",
+      "img": "images/3-mr58mec9.png",
       "desc": "A maior das embarcações. Cenas épicas de equipe, ideais ao pôr do sol."
     },
     {
       "name": "Caiaque",
       "cap": "Individual / duplo",
       "price": "R$50",
-      "img": "images/caiaque.png",
+      "img": "images/4-mr58ml4n.png",
       "desc": "Leve e livre. Você no mar com o skyline de Fortaleza ao fundo."
     },
     {
       "name": "Stand Up",
       "cap": "SUP / paddle",
       "price": "R$50",
-      "img": "images/standup.png",
+      "img": "images/5-mr58msqm.png",
       "desc": "Vista de topo do seu equilíbrio sobre a água. Take limpo e cinematográfico."
     },
     {
       "name": "Avaliação de Treino",
       "cap": "Atletas",
       "price": "R$100",
-      "img": "images/treino.png",
+      "img": "images/6-mr58n86x.png",
       "desc": "Análise aérea de técnica e desempenho para remadores e atletas."
     }
   ],
