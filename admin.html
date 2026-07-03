@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aerovisioon · Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0b0e10; color: #f2f4f5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+  a { color: inherit; }
+  .accent { color: #e8a04d; }
+  #login-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .login-box {
+    width: 100%; max-width: 360px; padding: 32px; border-radius: 18px;
+    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.1);
+  }
+  .login-box h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .login-box p { font-size: 13.5px; color: rgba(242,244,245,.6); margin-bottom: 22px; }
+  input, select, textarea {
+    width: 100%; padding: 12px 14px; border-radius: 10px; background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.14); color: #fff; font-size: 14.5px; outline: none; font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus { border-color: #e8a04d; }
+  button {
+    cursor: pointer; font-family: inherit; border: none; border-radius: 10px; font-weight: 700;
+  }
+  .btn-primary {
+    width: 100%; padding: 13px; background: #e8a04d; color: #0b0e10; font-size: 15px; margin-top: 16px;
+  }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-secondary {
+    padding: 9px 16px; background: rgba(255,255,255,.08); color: #fff; font-size: 13px; border: 1px solid rgba(255,255,255,.16);
+  }
+  .btn-danger { padding: 7px 12px; background: rgba(240,70,74,.14); color: #f0464a; border: 1px solid rgba(240,70,74,.35); font-size: 12.5px; }
+  .error-msg { color: #f0464a; font-size: 13px; margin-top: 12px; }
+  #app { display: none; max-width: 980px; margin: 0 auto; padding: 26px 20px 100px; }
+  header.top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; flex-wrap: wrap; gap: 12px; }
+  header.top h1 { font-size: 20px; font-weight: 700; }
+  header.top .sub { font-size: 12.5px; color: rgba(242,244,245,.5); }
+  .panel { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 22px; margin-bottom: 20px; }
+  .panel h2 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .panel .hint { font-size: 12.5px; color: rgba(242,244,245,.5); margin-bottom: 16px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12.5px; color: rgba(242,244,245,.65); margin-bottom: 6px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .item-card { border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 16px; margin-bottom: 12px; background: rgba(255,255,255,.02); }
+  .item-card .item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .item-head .idx { font-size: 12px; color: rgba(242,244,245,.4); font-family: monospace; }
+  .thumb-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .thumb-row img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,.1); background: #12161a; }
+  .file-btn { position: relative; overflow: hidden; }
+  .file-btn input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .add-btn { margin-top: 4px; }
+  #save-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11,14,16,.92); backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,.1); padding: 14px 20px; display: flex; align-items: center;
+    justify-content: center; gap: 16px; z-index: 50;
+  }
+  #save-bar button { padding: 13px 30px; background: #25d366; color: #06210f; font-size: 15px; }
+  #save-bar button:disabled { opacity: .5; cursor: not-allowed; }
+  #save-status { font-size: 13px; color: rgba(242,244,245,.65); }
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 22px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; z-index: 100; opacity: 0; transition: opacity .3s;
+  }
+  .toast.show { opacity: 1; }
+  .toast.ok { background: rgba(37,211,102,.15); border: 1px solid rgba(37,211,102,.4); color: #25d366; }
+  .toast.err { background: rgba(240,70,74,.15); border: 1px solid rgba(240,70,74,.4); color: #f0464a; }
+  small.muted { display: block; font-size: 11.5px; color: rgba(242,244,245,.4); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <form class="login-box" id="login-form">
+    <h1>Painel <span class="accent">Aerovisioon</span></h1>
+    <p>Entre com a senha de administrador para editar o site.</p>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="password" autocomplete="current-password" required>
+    </div>
+    <button class="btn-primary" type="submit" id="login-btn">Entrar</button>
+    <div class="error-msg" id="login-error" style="display:none"></div>
+  </form>
+</div>
+
+<div id="app">
+  <header class="top">
+    <div>
+      <h1>Painel <span class="accent">Aerovisioon</span></h1>
+      <div class="sub">Editar preços, fotos, depoimentos, FAQ e vídeos do site.</div>
+    </div>
+    <button class="btn-secondary" id="logout-btn">Sair</button>
+  </header>
+
+  <div class="panel">
+    <h2>Contato</h2>
+    <div class="hint">Número usado nos links de WhatsApp do site (só números, com DDI+DDD).</div>
+    <div class="row2">
+      <div class="field">
+        <label>Número WhatsApp</label>
+        <input id="f-wa" placeholder="5585999999999">
+      </div>
+      <div class="field">
+        <label>Mensagem padrão (botão do topo)</label>
+        <input id="f-waText">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Pacotes &amp; valores</h2>
+    <div class="hint">Cards exibidos na seção "Pacotes". A imagem também aparece no portfólio se o caminho coincidir.</div>
+    <div id="packages-list"></div>
+    <button class="btn-secondary add-btn" data-add="packages">+ Adicionar pacote</button>
+  </div>
+
+  <div class="panel">
+    <h2>Portfólio</h2>
+    <div class="hint">Fotos da galeria filtrável. Categoria deve ser: canoa, caiaque, standup ou treino.</div>
+    <div id="portfolio-list"></div>
+    <button class="btn-secondary add-btn" data-add="portfolio">+ Adicionar foto</button>
+  </div>
+
+  <div class="panel">
+    <h2>Vídeos</h2>
+    <div class="hint">Cole o link do YouTube, Vimeo ou um link de embed. Aparece na seção "Vídeos" do site.</div>
+    <div id="videos-list"></div>
+    <button class="btn-secondary add-btn" data-add="videos">+ Adicionar vídeo</button>
+  </div>
+
+  <div class="panel">
+    <h2>Depoimentos</h2>
+    <div id="testimonials-list"></div>
+    <button class="btn-secondary add-btn" data-add="testimonials">+ Adicionar depoimento</button>
+  </div>
+
+  <div class="panel">
+    <h2>Perguntas frequentes</h2>
+    <div id="faqs-list"></div>
+    <button class="btn-secondary add-btn" data-add="faqs">+ Adicionar pergunta</button>
+  </div>
+</div>
+
+<div id="save-bar" style="display:none">
+  <span id="save-status"></span>
+  <button id="save-btn">Salvar tudo</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  var TOKEN_KEY = 'aerov_admin_token';
+  var content = null;
+
+  function toast(msg, ok) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (ok ? 'ok' : 'err');
+    setTimeout(function () { t.className = 'toast'; }, 3500);
+  }
+
+  function getToken() { return localStorage.getItem(TOKEN_KEY); }
+  function setToken(t) { localStorage.setItem(TOKEN_KEY, t); }
+  function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+
+  function authFetch(url, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({}, opts.headers, { Authorization: 'Bearer ' + getToken() });
+    return fetch(url, opts);
+  }
+
+  function showApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('save-bar').style.display = 'flex';
+    loadContent();
+  }
+
+  function showLogin() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('save-bar').style.display = 'none';
+  }
+
+  document.getElementById('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('login-btn');
+    var err = document.getElementById('login-error');
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Entrando...';
+    fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: document.getElementById('password').value }),
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+        if (!res.ok) {
+          err.textContent = res.j.error || 'Erro ao entrar';
+          err.style.display = 'block';
+          return;
+        }
+        setToken(res.j.token);
+        showApp();
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+        err.textContent = 'Erro de rede. Tente novamente.';
+        err.style.display = 'block';
+      });
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', function () {
+    clearToken();
+    showLogin();
+  });
+
+  function loadContent() {
+    fetch('/content.json', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        content = data;
+        document.getElementById('f-wa').value = content.wa || '';
+        document.getElementById('f-waText').value = content.waHeroText || '';
+        renderList('packages', packageFields);
+        renderList('portfolio', portfolioFields);
+        renderList('videos', videoFields);
+        renderList('testimonials', testimonialFields);
+        renderList('faqs', faqFields);
+      })
+      .catch(function () { toast('Erro ao carregar conteúdo atual.', false); });
+  }
+
+  // ---- field schemas per list ----
+  function packageFields(item, i) {
+    return [
+      imageField('Foto', item.img, function (v) { content.packages[i].img = v; }),
+      textField('Nome', item.name, function (v) { content.packages[i].name = v; }),
+      textField('Capacidade', item.cap, function (v) { content.packages[i].cap = v; }),
+      textField('Preço (ex: R$100)', item.price, function (v) { content.packages[i].price = v; }),
+      textareaField('Descrição', item.desc, function (v) { content.packages[i].desc = v; }),
+    ];
+  }
+  function portfolioFields(item, i) {
+    return [
+      imageField('Foto', item.img, function (v) { content.portfolio[i].img = v; }),
+      textField('Legenda', item.caption, function (v) { content.portfolio[i].caption = v; }),
+      selectField('Categoria', item.cat, ['canoa', 'caiaque', 'standup', 'treino'], function (v) { content.portfolio[i].cat = v; }),
+      selectField('Tamanho no grid', String(item.span || 1), ['1', '2'], function (v) { content.portfolio[i].span = parseInt(v, 10); }),
+    ];
+  }
+  function videoFields(item, i) {
+    return [
+      textField('Título', item.title, function (v) { content.videos[i].title = v; }),
+      textField('Link (YouTube/Vimeo)', item.url, function (v) { content.videos[i].url = v; }),
+    ];
+  }
+  function testimonialFields(item, i) {
+    return [
+      textareaField('Depoimento', item.quote, function (v) { content.testimonials[i].quote = v; }),
+      textField('Nome', item.name, function (v) { content.testimonials[i].name = v; }),
+      textField('Passeio / função', item.role, function (v) { content.testimonials[i].role = v; }),
+      textField('Inicial (avatar)', item.initial, function (v) { content.testimonials[i].initial = v; }),
+    ];
+  }
+  function faqFields(item, i) {
+    return [
+      textField('Pergunta', item.q, function (v) { content.faqs[i].q = v; }),
+      textareaField('Resposta', item.a, function (v) { content.faqs[i].a = v; }),
+    ];
+  }
+
+  var DEFAULTS = {
+    packages: { name: 'Novo pacote', cap: '', price: 'R$0', img: '', desc: '' },
+    portfolio: { img: '', caption: '', cat: 'canoa', span: 1 },
+    videos: { title: '', url: '' },
+    testimonials: { quote: '', name: '', role: '', initial: 'A' },
+    faqs: { q: '', a: '' },
+  };
+
+  function el(tag, attrs, children) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === 'text') e.textContent = attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    });
+    (children || []).forEach(function (c) { e.appendChild(c); });
+    return e;
+  }
+
+  function textField(label, value, onChange) {
+    var wrap = el('div', { class: 'field' });
+    wrap.appendChild(el('label', { text: label }));
+    var input = el('input', { value: value || '' });
+    input.addEventListener('input', function () { onChange(input.value); });
+    wrap.appendChild(input);
+    return wrap;
+  }
+
+  function textareaField(label, value, onChange) {
+    var wrap = el('div', { class: 'field' });
+    wrap.appendChild(el('label', { text: label }));
+    var ta = el('textarea', { rows: '3' });
+    ta.value = value || '';
+    ta.addEventListener('input', function () { onChange(ta.value); });
+    wrap.appendChild(ta);
+    return wrap;
+  }
+
+  function selectField(label, value, options, onChange) {
+    var wrap = el('div', { class: 'field' });
+    wrap.appendChild(el('label', { text: label }));
+    var sel = el('select', {});
+    options.forEach(function (o) {
+      var opt = el('option', { value: o, text: o });
+      if (o === value) opt.setAttribute('selected', 'selected');
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function () { onChange(sel.value); });
+    wrap.appendChild(sel);
+    return wrap;
+  }
+
+  function imageField(label, value, onChange) {
+    var wrap = el('div', { class: 'field' });
+    wrap.appendChild(el('label', { text: label }));
+    var row = el('div', { class: 'thumb-row' });
+    var img = el('img', { src: value || '' });
+    img.onerror = function () { img.style.visibility = 'hidden'; };
+    row.appendChild(img);
+    var fileBtn = el('button', { class: 'btn-secondary file-btn', type: 'button', text: 'Trocar foto...' });
+    var fileInput = el('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp' });
+    fileBtn.appendChild(fileInput);
+    fileInput.addEventListener('change', function () {
+      var file = fileInput.files[0];
+      if (!file) return;
+      fileBtn.textContent = 'Enviando...';
+      var reader = new FileReader();
+      reader.onload = function () {
+        authFetch('/api/upload-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, dataBase64: reader.result }),
+        })
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            fileBtn.textContent = 'Trocar foto...';
+            fileBtn.appendChild(fileInput);
+            if (!res.ok) { toast(res.j.error || 'Erro ao enviar foto', false); return; }
+            img.src = res.j.path;
+            img.style.visibility = 'visible';
+            onChange(res.j.path);
+            toast('Foto enviada. Clique em "Salvar tudo" para publicar.', true);
+          })
+          .catch(function () {
+            fileBtn.textContent = 'Trocar foto...';
+            fileBtn.appendChild(fileInput);
+            toast('Erro de rede ao enviar foto', false);
+          });
+      };
+      reader.readAsDataURL(file);
+    });
+    row.appendChild(fileBtn);
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  function renderList(key, fieldsFn) {
+    var container = document.getElementById(key + '-list');
+    container.innerHTML = '';
+    (content[key] || []).forEach(function (item, i) {
+      var card = el('div', { class: 'item-card' });
+      var head = el('div', { class: 'item-head' });
+      head.appendChild(el('span', { class: 'idx', text: '#' + (i + 1) }));
+      var del = el('button', { class: 'btn-danger', type: 'button', text: 'Remover' });
+      del.addEventListener('click', function () {
+        content[key].splice(i, 1);
+        renderList(key, fieldsFn);
+      });
+      head.appendChild(del);
+      card.appendChild(head);
+      fieldsFn(item, i).forEach(function (f) { card.appendChild(f); });
+      container.appendChild(card);
+    });
+  }
+
+  document.querySelectorAll('[data-add]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-add');
+      var fieldsMap = { packages: packageFields, portfolio: portfolioFields, videos: videoFields, testimonials: testimonialFields, faqs: faqFields };
+      content[key] = content[key] || [];
+      content[key].push(Object.assign({}, DEFAULTS[key]));
+      renderList(key, fieldsMap[key]);
+    });
+  });
+
+  document.getElementById('save-btn').addEventListener('click', function () {
+    var btn = document.getElementById('save-btn');
+    var status = document.getElementById('save-status');
+    content.wa = document.getElementById('f-wa').value;
+    content.waHeroText = document.getElementById('f-waText').value;
+    btn.disabled = true;
+    status.textContent = 'Salvando...';
+    authFetch('/api/save-content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: content }),
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        btn.disabled = false;
+        if (!res.ok) {
+          status.textContent = '';
+          toast(res.j.error || 'Erro ao salvar', false);
+          return;
+        }
+        status.textContent = 'Salvo — o site atualiza em ~30s.';
+        toast('Alterações salvas! O site publica em cerca de 30 segundos.', true);
+      })
+      .catch(function () {
+        btn.disabled = false;
+        status.textContent = '';
+        toast('Erro de rede ao salvar', false);
+      });
+  });
+
+  // ---- boot ----
+  if (getToken()) {
+    showApp();
+  } else {
+    showLogin();
+  }
+})();
+</script>
+</body>
+</html>
