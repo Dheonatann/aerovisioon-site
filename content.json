@@ -2,35 +2,151 @@
   "wa": "5585992033550",
   "waHeroText": "Olá, Aerovisioon! Vim pelo site e quero saber mais sobre a filmagem aérea. 🚁",
   "packages": [
-    { "name": "Canoa OC6", "cap": "4 a 6 pessoas", "price": "R$100", "img": "images/oc6.png", "desc": "A canoa havaiana clássica. Perfeita para grupos pequenos e remadas em equipe." },
-    { "name": "Canoa Catamarã", "cap": "8 a 12 pessoas", "price": "R$150", "img": "images/catamara.png", "desc": "Duas cascas, mais gente a bordo. Registro aéreo do grupo remando em sincronia." },
-    { "name": "Canoa Trimarã", "cap": "14 a 18 pessoas", "price": "R$200", "img": "images/hero-sunset.png", "desc": "A maior das embarcações. Cenas épicas de equipe, ideais ao pôr do sol." },
-    { "name": "Caiaque", "cap": "Individual / duplo", "price": "R$50", "img": "images/caiaque.png", "desc": "Leve e livre. Você no mar com o skyline de Fortaleza ao fundo." },
-    { "name": "Stand Up", "cap": "SUP / paddle", "price": "R$50", "img": "images/standup.png", "desc": "Vista de topo do seu equilíbrio sobre a água. Take limpo e cinematográfico." },
-    { "name": "Avaliação de Treino", "cap": "Atletas", "price": "R$100", "img": "images/treino.png", "desc": "Análise aérea de técnica e desempenho para remadores e atletas." }
+    {
+      "name": "Canoa OC6",
+      "cap": "4 a 6 pessoas",
+      "price": "R$100",
+      "img": "images/oc6.png",
+      "desc": "A canoa havaiana clássica. Perfeita para grupos pequenos e remadas em equipe."
+    },
+    {
+      "name": "Canoa Catamarã",
+      "cap": "8 a 12 pessoas",
+      "price": "R$150",
+      "img": "images/catamara.png",
+      "desc": "Duas cascas, mais gente a bordo. Registro aéreo do grupo remando em sincronia."
+    },
+    {
+      "name": "Canoa Trimarã",
+      "cap": "14 a 18 pessoas",
+      "price": "R$200",
+      "img": "images/hero-sunset.png",
+      "desc": "A maior das embarcações. Cenas épicas de equipe, ideais ao pôr do sol."
+    },
+    {
+      "name": "Caiaque",
+      "cap": "Individual / duplo",
+      "price": "R$50",
+      "img": "images/caiaque.png",
+      "desc": "Leve e livre. Você no mar com o skyline de Fortaleza ao fundo."
+    },
+    {
+      "name": "Stand Up",
+      "cap": "SUP / paddle",
+      "price": "R$50",
+      "img": "images/standup.png",
+      "desc": "Vista de topo do seu equilíbrio sobre a água. Take limpo e cinematográfico."
+    },
+    {
+      "name": "Avaliação de Treino",
+      "cap": "Atletas",
+      "price": "R$100",
+      "img": "images/treino.png",
+      "desc": "Análise aérea de técnica e desempenho para remadores e atletas."
+    }
   ],
   "portfolio": [
-    { "img": "images/oc6.png", "caption": "Canoa OC6 · Praia de Iracema", "cat": "canoa", "span": 2 },
-    { "img": "images/hero-sunset.png", "caption": "Trimarã ao pôr do sol", "cat": "canoa", "span": 2 },
-    { "img": "images/catamara.png", "caption": "Catamarã · equipe completa", "cat": "canoa", "span": 1 },
-    { "img": "images/caiaque.png", "caption": "Caiaque duplo · Beira-Mar", "cat": "caiaque", "span": 2 },
-    { "img": "images/kayak-wide.png", "caption": "Caiaque · skyline de Fortaleza", "cat": "caiaque", "span": 1 },
-    { "img": "images/standup.png", "caption": "Stand Up · vista de topo", "cat": "standup", "span": 1 },
-    { "img": "images/windsurf.png", "caption": "Windsurf · mar aberto", "cat": "standup", "span": 1 },
-    { "img": "images/treino.png", "caption": "Avaliação de treino · OC1", "cat": "treino", "span": 1 },
-    { "img": "images/outrigger.png", "caption": "OC1 · treino individual", "cat": "treino", "span": 1 }
+    {
+      "img": "images/oc6.png",
+      "caption": "Canoa OC6 · Praia de Iracema",
+      "cat": "canoa",
+      "span": 2
+    },
+    {
+      "img": "images/hero-sunset.png",
+      "caption": "Trimarã ao pôr do sol",
+      "cat": "canoa",
+      "span": 2
+    },
+    {
+      "img": "images/catamara.png",
+      "caption": "Catamarã · equipe completa",
+      "cat": "canoa",
+      "span": 1
+    },
+    {
+      "img": "images/caiaque.png",
+      "caption": "Caiaque duplo · Beira-Mar",
+      "cat": "caiaque",
+      "span": 2
+    },
+    {
+      "img": "images/kayak-wide.png",
+      "caption": "Caiaque · skyline de Fortaleza",
+      "cat": "caiaque",
+      "span": 1
+    },
+    {
+      "img": "images/standup.png",
+      "caption": "Stand Up · vista de topo",
+      "cat": "standup",
+      "span": 1
+    },
+    {
+      "img": "images/windsurf.png",
+      "caption": "Windsurf · mar aberto",
+      "cat": "standup",
+      "span": 1
+    },
+    {
+      "img": "images/treino.png",
+      "caption": "Avaliação de treino · OC1",
+      "cat": "treino",
+      "span": 1
+    },
+    {
+      "img": "images/outrigger.png",
+      "caption": "OC1 · treino individual",
+      "cat": "treino",
+      "span": 1
+    }
   ],
   "testimonials": [
-    { "quote": "As imagens ficaram surreais, parecia filme. Todo mundo do grupo pediu cópia!", "name": "Depoimento real aqui", "role": "Passeio de canoa OC6", "initial": "A" },
-    { "quote": "Profissional do começo ao fim. Entrega rápida e qualidade absurda em 4K.", "name": "Depoimento real aqui", "role": "Caiaque · Beira-Mar", "initial": "B" },
-    { "quote": "Vista de cima mudou tudo. Recomendo pra qualquer atleta que treina no mar.", "name": "Depoimento real aqui", "role": "Avaliação de treino", "initial": "C" }
+    {
+      "quote": "As imagens ficaram surreais, parecia filme. Todo mundo do grupo pediu cópia!",
+      "name": "Depoimento real aqui",
+      "role": "Passeio de canoa OC6",
+      "initial": "A"
+    },
+    {
+      "quote": "Profissional do começo ao fim. Entrega rápida e qualidade absurda em 4K.",
+      "name": "Depoimento real aqui",
+      "role": "Caiaque · Beira-Mar",
+      "initial": "B"
+    },
+    {
+      "quote": "Vista de cima mudou tudo. Recomendo pra qualquer atleta que treina no mar.",
+      "name": "Depoimento real aqui",
+      "role": "Avaliação de treino",
+      "initial": "C"
+    }
   ],
   "faqs": [
-    { "q": "Como recebo os arquivos?", "a": "A entrega é feita em qualidade 4K por link de download (Google Drive ou WeTransfer), combinado logo após o passeio." },
-    { "q": "Posso escolher entre fotos e vídeos?", "a": "Sim. Cada projeto tem 5 takes, no formato 3 vídeos + 2 fotos ou 3 fotos + 2 vídeos — você escolhe." },
-    { "q": "Vocês atendem em qual região?", "a": "Fortaleza e praias próximas: Praia de Iracema, Beira-Mar, Mucuripe e região." },
-    { "q": "Preciso pagar antecipado?", "a": "Combinamos na reserva. Aceitamos Pix, cartão (crédito/débito) e dinheiro." },
-    { "q": "E se o tempo estiver ruim?", "a": "Sem problema. Remarcamos sem custo para um dia com boas condições de voo e de mar." }
+    {
+      "q": "Como recebo os arquivos?",
+      "a": "A entrega é feita em qualidade 4K por link de download (Google Drive ou WeTransfer), combinado logo após o passeio."
+    },
+    {
+      "q": "Posso escolher entre fotos e vídeos?",
+      "a": "Sim. Cada projeto tem 5 takes, no formato 3 vídeos + 2 fotos ou 3 fotos + 2 vídeos — você escolhe."
+    },
+    {
+      "q": "Vocês atendem em qual região?",
+      "a": "Fortaleza e praias próximas: Praia de Iracema, Beira-Mar, Mucuripe e região."
+    },
+    {
+      "q": "Preciso pagar antecipado?",
+      "a": "Combinamos na reserva. Aceitamos Pix, cartão (crédito/débito) e dinheiro."
+    },
+    {
+      "q": "E se o tempo estiver ruim?",
+      "a": "Sem problema. Remarcamos sem custo para um dia com boas condições de voo e de mar."
+    }
   ],
-  "videos": []
+  "videos": [
+    {
+      "title": "Verificação automática",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    }
+  ]
 }
