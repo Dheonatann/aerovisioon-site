@@ -11,7 +11,16 @@ module.exports = async (req, res) => {
     return;
   }
   if (password !== process.env.ADMIN_PASSWORD) {
-    res.status(401).json({ error: 'Senha incorreta' });
+    res.status(401).json({
+      error: 'Senha incorreta',
+      debug: {
+        bodyType: typeof req.body,
+        receivedLen: password ? password.length : null,
+        receivedChars: password ? JSON.stringify(password) : null,
+        envLen: process.env.ADMIN_PASSWORD.length,
+        envChars: JSON.stringify(process.env.ADMIN_PASSWORD),
+      },
+    });
     return;
   }
   const token = sign({ exp: Date.now() + 12 * 3600 * 1000 }, process.env.AUTH_SECRET);
