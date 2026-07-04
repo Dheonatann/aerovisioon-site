@@ -529,11 +529,26 @@
     });
   });
 
+  function findMissingPhoto() {
+    var missing = (content.portfolio || []).find(function (p) { return !p.img; });
+    if (missing) return 'Portfólio "' + (missing.caption || '(sem legenda)') + '" está sem foto.';
+    missing = (content.packages || []).find(function (p) { return !p.img; });
+    if (missing) return 'Pacote "' + (missing.name || '(sem nome)') + '" está sem foto.';
+    return null;
+  }
+
   document.getElementById('save-btn').addEventListener('click', function () {
     var btn = document.getElementById('save-btn');
     var status = document.getElementById('save-status');
     content.wa = document.getElementById('f-wa').value;
     content.waHeroText = document.getElementById('f-waText').value;
+
+    var missingPhotoMsg = findMissingPhoto();
+    if (missingPhotoMsg) {
+      toast(missingPhotoMsg + ' Envie uma foto ou remova o item antes de salvar.', false);
+      return;
+    }
+
     btn.disabled = true;
     status.textContent = 'Salvando...';
 
