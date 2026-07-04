@@ -89,8 +89,14 @@
       "span": 1
     },
     {
-      "img": "",
+      "img": "images/dji-20260524223425-0010-d-mr6bs0ae.jpg",
       "caption": "Rapel ",
+      "cat": "treino",
+      "span": 1
+    },
+    {
+      "img": "images/dji-20260523234143-0068-d-mr6bshrb.jpg",
+      "caption": "Rapel",
       "cat": "treino",
       "span": 1
     }
