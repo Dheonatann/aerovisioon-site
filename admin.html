@@ -172,10 +172,36 @@
   function setToken(t) { localStorage.setItem(TOKEN_KEY, t); }
   function clearToken() { localStorage.removeItem(TOKEN_KEY); }
 
+  function tokenValid() {
+    var t = getToken();
+    if (!t || t.indexOf('.') === -1) return false;
+    try {
+      var data = t.split('.')[0].replace(/-/g, '+').replace(/_/g, '/');
+      var payload = JSON.parse(atob(data));
+      return !!payload.exp && payload.exp > Date.now();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function handleSessionExpired() {
+    clearToken();
+    showLogin();
+    var err = document.getElementById('login-error');
+    err.textContent = 'Sessão expirada. Faça login novamente.';
+    err.style.display = 'block';
+  }
+
   function authFetch(url, opts) {
     opts = opts || {};
     opts.headers = Object.assign({}, opts.headers, { Authorization: 'Bearer ' + getToken() });
-    return fetch(url, opts);
+    return fetch(url, opts).then(function (r) {
+      if (r.status === 401) {
+        handleSessionExpired();
+        throw new Error('__session_expired__');
+      }
+      return r;
+    });
   }
 
   function showApp() {
@@ -365,10 +391,10 @@
             onChange(res.j.path);
             toast('Foto enviada. Clique em "Salvar tudo" para publicar.', true);
           })
-          .catch(function () {
+          .catch(function (e) {
             fileBtn.textContent = 'Trocar foto...';
             fileBtn.appendChild(fileInput);
-            toast('Erro de rede ao enviar foto', false);
+            if (e.message !== '__session_expired__') toast('Erro de rede ao enviar foto', false);
           });
       };
       reader.readAsDataURL(file);
@@ -430,17 +456,18 @@
         status.textContent = 'Salvo — o site atualiza em ~30s.';
         toast('Alterações salvas! O site publica em cerca de 30 segundos.', true);
       })
-      .catch(function () {
+      .catch(function (e) {
         btn.disabled = false;
         status.textContent = '';
-        toast('Erro de rede ao salvar', false);
+        if (e.message !== '__session_expired__') toast('Erro de rede ao salvar', false);
       });
   });
 
   // ---- boot ----
-  if (getToken()) {
+  if (tokenValid()) {
     showApp();
   } else {
+    clearToken();
     showLogin();
   }
 })();
