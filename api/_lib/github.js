@@ -37,20 +37,34 @@ async function getFile(path) {
   return { sha: json.sha, content: Buffer.from(json.content, 'base64').toString('utf8') };
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function putFile(path, base64Content, message) {
   const { owner, name, branch } = repoInfo();
-  const sha = await getFileSha(path);
-  const res = await ghFetch(`/repos/${owner}/${name}/contents/${encodeURIComponent(path)}`, {
-    method: 'PUT',
-    body: JSON.stringify({
-      message,
-      content: base64Content,
-      branch,
-      ...(sha ? { sha } : {}),
-    }),
-  });
-  if (!res.ok) throw new Error('GitHub PUT failed: ' + res.status + ' ' + (await res.text()));
-  return res.json();
+  let lastErr;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const sha = await getFileSha(path);
+    const res = await ghFetch(`/repos/${owner}/${name}/contents/${encodeURIComponent(path)}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        message,
+        content: base64Content,
+        branch,
+        ...(sha ? { sha } : {}),
+      }),
+    });
+    if (res.ok) return res.json();
+    const text = await res.text();
+    lastErr = new Error('GitHub PUT failed: ' + res.status + ' ' + text);
+    // 409 = another write landed between our sha read and this PUT (or 422 with a sha mismatch
+    // message, which GitHub sometimes returns instead). Re-fetch the latest sha and retry.
+    const isConflict = res.status === 409 || (res.status === 422 && /sha/i.test(text));
+    if (!isConflict) throw lastErr;
+    await sleep(150 + Math.floor(Math.random() * 250));
+  }
+  throw lastErr;
 }
 
 module.exports = { putFile, getFileSha, getFile };
