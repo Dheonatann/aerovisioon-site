@@ -74,6 +74,17 @@
   .toast.ok { background: rgba(37,211,102,.15); border: 1px solid rgba(37,211,102,.4); color: #25d366; }
   .toast.err { background: rgba(240,70,74,.15); border: 1px solid rgba(240,70,74,.4); color: #f0464a; }
   small.muted { display: block; font-size: 11.5px; color: rgba(242,244,245,.4); margin-top: 4px; }
+  .res-card { border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 16px; margin-bottom: 12px; background: rgba(255,255,255,.02); }
+  .res-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .res-name { font-size: 15.5px; font-weight: 700; }
+  .res-meta { font-size: 13px; color: rgba(242,244,245,.65); margin-top: 3px; line-height: 1.6; }
+  .res-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+  .res-badge.pendente { background: rgba(232,160,77,.15); color: #e8a04d; border: 1px solid rgba(232,160,77,.4); }
+  .res-badge.confirmada { background: rgba(37,211,102,.15); color: #25d366; border: 1px solid rgba(37,211,102,.4); }
+  .res-badge.cancelada { background: rgba(240,70,74,.15); color: #f0464a; border: 1px solid rgba(240,70,74,.4); }
+  .res-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .res-actions select { width: auto; padding: 8px 10px; font-size: 13px; }
+  .res-wa { color: #25d366; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -99,6 +110,13 @@
     </div>
     <button class="btn-secondary" id="logout-btn">Sair</button>
   </header>
+
+  <div class="panel">
+    <h2>Reservas</h2>
+    <div class="hint">Pedidos de reserva feitos pelos clientes no site (nome, data, horário e local). Marque como confirmada ou remova, e clique em "Salvar tudo" no rodapé para gravar.</div>
+    <div id="reservations-status" class="hint"></div>
+    <div id="reservations-list"></div>
+  </div>
 
   <div class="panel">
     <h2>Contato</h2>
@@ -209,6 +227,7 @@
     document.getElementById('app').style.display = 'block';
     document.getElementById('save-bar').style.display = 'flex';
     loadContent();
+    loadReservations();
   }
 
   function showLogin() {
@@ -268,6 +287,83 @@
         renderList('faqs', faqFields);
       })
       .catch(function () { toast('Erro ao carregar conteúdo atual.', false); });
+  }
+
+  var reservations = null;
+
+  function loadReservations() {
+    var statusEl = document.getElementById('reservations-status');
+    statusEl.textContent = 'Carregando...';
+    fetch('/reservations.json', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (data) {
+        reservations = Array.isArray(data) ? data : [];
+        statusEl.textContent = reservations.length
+          ? reservations.length + ' reserva(s).'
+          : 'Nenhuma reserva ainda.';
+        renderReservations();
+      })
+      .catch(function () {
+        statusEl.textContent = '';
+        toast('Erro ao carregar reservas.', false);
+      });
+  }
+
+  function waLinkFor(phone, text) {
+    var digits = String(phone || '').replace(/\D/g, '');
+    return 'https://wa.me/' + digits + (text ? '?text=' + encodeURIComponent(text) : '');
+  }
+
+  function renderReservations() {
+    var container = document.getElementById('reservations-list');
+    container.innerHTML = '';
+    var sorted = reservations.slice().sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+    sorted.forEach(function (r) {
+      var realIndex = reservations.indexOf(r);
+      var card = el('div', { class: 'res-card' });
+
+      var top = el('div', { class: 'res-top' });
+      var left = el('div', {});
+      left.appendChild(el('div', { class: 'res-name', text: r.name || '(sem nome)' }));
+      left.appendChild(el('div', {
+        class: 'res-meta',
+        text: (r.package || '—') + ' · ' + (r.date || '—') + ' às ' + (r.time || '—') + ' · ' + (r.location || '—'),
+      }));
+      top.appendChild(left);
+      top.appendChild(el('span', { class: 'res-badge ' + (r.status || 'pendente'), text: r.status || 'pendente' }));
+      card.appendChild(top);
+
+      var actions = el('div', { class: 'res-actions' });
+      if (r.whatsapp) {
+        var waLink = el('a', {
+          class: 'res-wa',
+          href: waLinkFor(r.whatsapp, 'Olá ' + (r.name || '') + '! Aqui é da Aerovisioon, vamos confirmar sua reserva.'),
+          target: '_blank',
+          text: '✆ ' + r.whatsapp,
+        });
+        actions.appendChild(waLink);
+      }
+      var statusSel = el('select', {});
+      ['pendente', 'confirmada', 'cancelada'].forEach(function (s) {
+        var opt = el('option', { value: s, text: s });
+        if (s === (r.status || 'pendente')) opt.setAttribute('selected', 'selected');
+        statusSel.appendChild(opt);
+      });
+      statusSel.addEventListener('change', function () {
+        reservations[realIndex].status = statusSel.value;
+        renderReservations();
+      });
+      actions.appendChild(statusSel);
+      var del = el('button', { class: 'btn-danger', type: 'button', text: 'Remover' });
+      del.addEventListener('click', function () {
+        reservations.splice(realIndex, 1);
+        renderReservations();
+      });
+      actions.appendChild(del);
+      card.appendChild(actions);
+
+      container.appendChild(card);
+    });
   }
 
   // ---- field schemas per list ----
@@ -440,17 +536,31 @@
     content.waHeroText = document.getElementById('f-waText').value;
     btn.disabled = true;
     status.textContent = 'Salvando...';
-    authFetch('/api/save-content', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: content }),
-    })
-      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-      .then(function (res) {
+
+    var calls = [
+      authFetch('/api/save-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content }),
+      }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); }),
+    ];
+    if (Array.isArray(reservations)) {
+      calls.push(
+        authFetch('/api/save-reservations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reservations: reservations }),
+        }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      );
+    }
+
+    Promise.all(calls)
+      .then(function (results) {
         btn.disabled = false;
-        if (!res.ok) {
+        var failed = results.find(function (res) { return !res.ok; });
+        if (failed) {
           status.textContent = '';
-          toast(res.j.error || 'Erro ao salvar', false);
+          toast(failed.j.error || 'Erro ao salvar', false);
           return;
         }
         status.textContent = 'Salvo — o site atualiza em ~30s.';

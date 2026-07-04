@@ -24,12 +24,17 @@ async function ghFetch(path, options) {
 }
 
 async function getFileSha(path) {
+  const file = await getFile(path);
+  return file ? file.sha : null;
+}
+
+async function getFile(path) {
   const { owner, name, branch } = repoInfo();
   const res = await ghFetch(`/repos/${owner}/${name}/contents/${encodeURIComponent(path)}?ref=${branch}`);
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('GitHub GET failed: ' + res.status + ' ' + (await res.text()));
   const json = await res.json();
-  return json.sha;
+  return { sha: json.sha, content: Buffer.from(json.content, 'base64').toString('utf8') };
 }
 
 async function putFile(path, base64Content, message) {
@@ -48,4 +53,4 @@ async function putFile(path, base64Content, message) {
   return res.json();
 }
 
-module.exports = { putFile, getFileSha };
+module.exports = { putFile, getFileSha, getFile };
