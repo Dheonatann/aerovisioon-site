@@ -47,56 +47,44 @@
   ],
   "portfolio": [
     {
-      "img": "images/oc6.png",
+      "img": "images/img-5091.jpg-mr5npumb.jpg",
       "caption": "Canoa OC6 · Praia de Iracema",
       "cat": "canoa",
       "span": 2
     },
     {
-      "img": "images/hero-sunset.png",
+      "img": "images/img-5088.jpg-mr5nq4jm.jpg",
       "caption": "Trimarã ao pôr do sol",
       "cat": "canoa",
       "span": 2
     },
     {
-      "img": "images/catamara.png",
+      "img": "images/img-5087.jpg-mr5nqca1.jpg",
       "caption": "Catamarã · equipe completa",
       "cat": "canoa",
       "span": 1
     },
     {
-      "img": "images/caiaque.png",
+      "img": "images/img-5092.jpg-mr5nv5vs.jpg",
       "caption": "Caiaque duplo · Beira-Mar",
       "cat": "caiaque",
       "span": 2
     },
     {
-      "img": "images/kayak-wide.png",
-      "caption": "Caiaque · skyline de Fortaleza",
-      "cat": "caiaque",
-      "span": 1
-    },
-    {
-      "img": "images/standup.png",
+      "img": "images/8-mr5nw12d.png",
       "caption": "Stand Up · vista de topo",
       "cat": "standup",
       "span": 1
     },
     {
-      "img": "images/windsurf.png",
+      "img": "images/10-mr5nx93b.png",
       "caption": "Windsurf · mar aberto",
       "cat": "standup",
       "span": 1
     },
     {
-      "img": "images/treino.png",
-      "caption": "Avaliação de treino · OC1",
-      "cat": "treino",
-      "span": 1
-    },
-    {
-      "img": "images/outrigger.png",
-      "caption": "OC1 · treino individual",
+      "img": "images/11-mr5nxoyt.png",
+      "caption": "Velha",
       "cat": "treino",
       "span": 1
     }
