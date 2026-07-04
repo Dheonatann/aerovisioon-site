@@ -456,6 +456,34 @@
     return wrap;
   }
 
+  // Downscales/recompresses the photo in the browser before upload so phone
+  // photos (often 3-10MB) never hit the server/GitHub API's payload limits.
+  function resizeImageForUpload(file, maxDim, quality) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      var objectUrl = URL.createObjectURL(file);
+      img.onload = function () {
+        URL.revokeObjectURL(objectUrl);
+        var w = img.naturalWidth, h = img.naturalHeight;
+        var scale = Math.min(1, maxDim / Math.max(w, h));
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.round(w * scale);
+        canvas.height = Math.round(h * scale);
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(function (blob) {
+          if (!blob) { reject(new Error('Falha ao processar imagem')); return; }
+          var reader = new FileReader();
+          reader.onload = function () { resolve(reader.result); };
+          reader.onerror = function () { reject(new Error('Falha ao ler imagem processada')); };
+          reader.readAsDataURL(blob);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = function () { URL.revokeObjectURL(objectUrl); reject(new Error('Não foi possível abrir a imagem')); };
+      img.src = objectUrl;
+    });
+  }
+
   function imageField(label, value, onChange) {
     var wrap = el('div', { class: 'field' });
     wrap.appendChild(el('label', { text: label }));
@@ -470,30 +498,35 @@
       var file = fileInput.files[0];
       if (!file) return;
       fileBtn.textContent = 'Enviando...';
-      var reader = new FileReader();
-      reader.onload = function () {
-        authFetch('/api/upload-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filename: file.name, dataBase64: reader.result }),
-        })
-          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-          .then(function (res) {
-            fileBtn.textContent = 'Trocar foto...';
-            fileBtn.appendChild(fileInput);
-            if (!res.ok) { toast(res.j.error || 'Erro ao enviar foto', false); return; }
-            img.src = res.j.path;
-            img.style.visibility = 'visible';
-            onChange(res.j.path);
-            toast('Foto enviada. Clique em "Salvar tudo" para publicar.', true);
-          })
-          .catch(function (e) {
-            fileBtn.textContent = 'Trocar foto...';
-            fileBtn.appendChild(fileInput);
-            if (e.message !== '__session_expired__') toast('Erro de rede ao enviar foto', false);
+      resizeImageForUpload(file, 1920, 0.82)
+        .then(function (dataUrl) {
+          return authFetch('/api/upload-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: file.name, dataBase64: dataUrl }),
           });
-      };
-      reader.readAsDataURL(file);
+        })
+        .then(function (r) {
+          return r.text().then(function (text) {
+            var j;
+            try { j = JSON.parse(text); } catch (e) { j = { error: 'Resposta inesperada do servidor (' + r.status + ')' }; }
+            return { ok: r.ok, j: j };
+          });
+        })
+        .then(function (res) {
+          fileBtn.textContent = 'Trocar foto...';
+          fileBtn.appendChild(fileInput);
+          if (!res.ok) { toast(res.j.error || 'Erro ao enviar foto', false); return; }
+          img.src = res.j.path;
+          img.style.visibility = 'visible';
+          onChange(res.j.path);
+          toast('Foto enviada. Clique em "Salvar tudo" para publicar.', true);
+        })
+        .catch(function (e) {
+          fileBtn.textContent = 'Trocar foto...';
+          fileBtn.appendChild(fileInput);
+          if (e.message !== '__session_expired__') toast(e.message || 'Erro de rede ao enviar foto', false);
+        });
     });
     row.appendChild(fileBtn);
     wrap.appendChild(row);
